@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CRUD! 😛</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <div class="container">
@@ -14,24 +14,24 @@
         <div class="editor">
           <div class="input-box">
             <label>학생 이름 : </label>
-            <input type="text" placeholder=" 이름을 입력하세요..." />
+            <input id="studentName" type="text" placeholder=" 이름을 입력하세요..." />
           </div>
           <div class="input-box">
             <label>학생 나이 : </label>
-            <input type="number" placeholder=" 나이를 입력하세요..." />
+            <input id="studentAge" type="number" placeholder=" 나이를 입력하세요..." />
           </div>
           <div class="input-box">
             <label>연락처 : </label>
-            <input type="number" placeholder=" - 를 제거하고 입력하세요." />
+            <input id="studentPhone" type="number" placeholder=" - 를 제거하고 입력하세요." />
           </div>
           <div class="input-box">
             <label>주소 </label>
-            <input type="text" placeholder=" 주소를 입력하세요..." />
+            <input id="address" type="text" placeholder=" 주소를 입력하세요..." />
             <button class="postBtn" onclick="getPostCode()">우편번호 찾기</button>
           </div>
           <div class="btn-area">
             <a href="#" class="btn-cancel" onclick="">등록 취소</a>
-            <a href="#" class="btn-success" onclick="">학생 등록</a>
+            <a href="#" class="btn-success" onclick="doJoin()">학생 등록</a>
           </div>
         </div>
       </div>
@@ -43,28 +43,28 @@
           </div>
           <div class="input-box">
             <label>학생 번호 : </label>
-            <input type="number" value="7899" readonly />
+            <input id="f_studentNumber" type="number" readonly />
           </div>
           <div class="input-box">
             <label>학생 이름 : </label>
-            <input type="text" value="현상원" />
+            <input id="f_studentName" type="text" />
           </div>
           <div class="input-box">
             <label>학생 나이 : </label>
-            <input type="number" value="88" placeholder=" 나이를 입력하세요..." />
+            <input id="f_studentAge" type="number" placeholder=" 나이를 입력하세요..." />
           </div>
           <div class="input-box">
             <label>연락처 : </label>
-            <input type="number" value="010-4097-****" placeholder=" - 를 제거하고 입력하세요." />
+            <input id="f_studentPhone" type="number" placeholder=" - 를 제거하고 입력하세요." />
           </div>
           <div class="input-box">
             <label>주소 </label>
-            <input type="text" value="대전 선화동 방산빌딩 지하 53층" placeholder=" 주소를 입력하세요..." />
+            <input id="f_address" type="text" placeholder=" 주소를 입력하세요..." />
             <button class="postBtn" onclick="getPostCode()">우편번호 찾기</button>
           </div>
           <div class="btn-area">
-            <a href="#" class="btn-update" onclick="">수정</a>
-            <a href="#" class="btn-delete" onclick="">삭제</a>
+            <a href="#" class="btn-update" onclick="doUpdate()">수정</a>
+            <a href="#" class="btn-delete" onclick="doDelete()">삭제</a>
           </div>
         </div>
       </div>
@@ -77,13 +77,13 @@
             </a>
           </li>
           <li>
-            <a href="./index.html">
+            <a href="/student">
               <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
               <span class="title">학생 목록</span>
             </a>
           </li>
           <li>
-            <a href="./dept.html">
+            <a href="/course">
               <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
               <span class="title">과정 목록</span>
             </a>
@@ -103,7 +103,7 @@
       <div class="cardBox">
         <div class="card">
           <div>
-            <div id="studentsCnt" class="numbers">2</div>
+            <div id="studentsCnt" class="numbers"></div>
             <div class="cardName">학생 수</div>
           </div>
           <div class="iconBx">
@@ -112,7 +112,7 @@
         </div>
         <div class="card">
           <div>
-            <div id="boardCnt" class="numbers">27.6</div>
+            <div id="boardCnt" class="numbers"></div>
             <div class="cardName">학생 평균나이</div>
           </div>
           <div class="iconBx">
@@ -139,24 +139,7 @@
                 <th>과정 명</th>
               </tr>
             </thead>
-            <tbody id="data">
-              <tr onclick="getData()">
-                <td>6500</td>
-                <td>현상원</td>
-                <td>55</td>
-                <td>010-4097-****</td>
-                <td>대전 충정로 136</td>
-                <td>IoT 임베디드 과정</td>
-              </tr>
-              <tr onclick="getData()">
-                <td>7000</td>
-                <td>예진쌤</td>
-                <td>22</td>
-                <td>010-3371-****</td>
-                <td>서울 강남구 테헤란로 521</td>
-                <td>React 과정</td>
-              </tr>
-            </tbody>
+            <tbody id="data"></tbody>
           </table>
           <!-- 페이징 처리하는 HTML -->
           <div class="pagination">
@@ -203,8 +186,20 @@
     list.forEach((item) => {
       item.addEventListener('mouseover', activeLink);
     });
-    function getData() {
+    function getData(studentNumber) {
       $('.update-popup').css('display', 'block');
+      $.ajax({
+        url: '/student/' + studentNumber,
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+          $('#f_studentNumber').val(response.studentNumber);
+          $('#f_studentName').val(response.studentName);
+          $('#f_studentAge').val(response.studentAge);
+          $('#f_studentPhone').val(response.studentPhone);
+          $('#f_address').val(response.address);
+        },
+      });
     }
 
     //도로명 주소 함수
@@ -232,8 +227,123 @@
           if (fullRoadAddr !== '') {
             fullRoadAddr += extraRoadAddr;
           }
+          $('#address').val(fullRoadAddr);
         },
       }).open();
+    }
+  </script>
+  <script>
+    callMyAPI();
+    function callMyAPI() {
+      studentsCnt = 0;
+      boardCnt = 0;
+      $.ajax({
+        url: '/students',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+          console.log(response);
+
+          for (var i in response) {
+            let tr = $("<tr onclick='getData( " + response[i].studentNumber + " )'></tr>");
+            let studentNumber = $('<td>' + response[i].studentNumber + '</td>');
+            let studentName = $('<td>' + response[i].studentName + '</a></td>');
+            let studentAge = $('<td>' + response[i].studentAge + '</td>');
+            let studentPhone = $(
+              '<td>' +
+                response[i].studentPhone.substring(0, 3) +
+                '-' +
+                response[i].studentPhone.substring(3, 7) +
+                '-' +
+                response[i].studentPhone.substring(7, 11) +
+                '</td>',
+            );
+            let address = $('<td>' + response[i].address + '</td>');
+            let curriculumName = $('<td>' + response[i].curriculumName + '</td>');
+            tr.append(studentNumber);
+            tr.append(studentName);
+            tr.append(studentAge);
+            tr.append(studentPhone);
+            tr.append(address);
+            tr.append(curriculumName);
+            $('#data').append(tr);
+            studentsCnt += 1;
+            boardCnt += response[i].studentAge;
+          }
+          boardCnt = boardCnt / studentsCnt;
+          $('#studentsCnt').append(studentsCnt);
+          $('#boardCnt').append(parseInt(boardCnt));
+        },
+      });
+    }
+
+    function doJoin() {
+      var studentName = $('#studentName').val();
+      var studentAge = $('#studentAge').val();
+      var studentPhone = $('#studentPhone').val();
+      var address = $('#address').val();
+
+      var jsonData = {
+        studentName: studentName,
+        studentAge: studentAge,
+        studentPhone: studentPhone,
+        address: address,
+      };
+
+      //AJAX 호출
+      $.ajax({
+        url: '/student',
+        contentType: 'application/json', //서버에 json타입으로 보낼 예정(요청)
+        type: 'POST',
+        data: JSON.stringify(jsonData),
+        dataType: 'json',
+        success: function (response) {
+          alert('학생추가 완료');
+          location.reload(); //새로고침
+        },
+      });
+    }
+
+    function doUpdate() {
+      var studentNumber = $('#f_studentNumber').val();
+      var studentName = $('#f_studentName').val();
+      var studentAge = $('#f_studentAge').val();
+      var studentPhone = $('#f_studentPhone').val();
+      var address = $('#f_address').val();
+
+      var jsonData = {
+        studentNumber: studentNumber,
+        studentName: studentName,
+        studentAge: studentAge,
+        studentPhone: studentPhone,
+        address: address,
+      };
+
+      $.ajax({
+        url: '/student',
+        type: 'PATCH',
+        contentType: 'application/json', //서버에 json타입으로 보낼 예정(요청)
+        data: JSON.stringify(jsonData),
+        dataType: 'json',
+        success: function (response) {
+          alert('학생수정 완료');
+          location.reload(); //새로고침
+        },
+      });
+    }
+
+    function doDelete() {
+      var studentNumber = $('#f_studentNumber').val();
+      // 사원삭제 ajax 연결하기
+      $.ajax({
+        url: '/student/' + studentNumber,
+        type: 'DELETE',
+        dataType: 'json',
+        success: function (response) {
+          alert(' 학생삭제완료 ');
+          location.reload(); //새로고침
+        },
+      });
     }
   </script>
 </html>

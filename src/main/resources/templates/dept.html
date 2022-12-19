@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CRUD! 😛</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <div class="container">
@@ -14,28 +14,28 @@
         <div class="editor">
           <div class="input-box">
             <label>과정 번호 : </label>
-            <input type="number" placeholder="과정번호를 입력하세요..." />
+            <input id="courseNumber" type="number" placeholder="과정번호를 입력하세요..." />
           </div>
           <div class="input-box">
             <label>과정 명 : </label>
-            <input type="text" placeholder="과정명을 입력하세요..." />
+            <input id="courseName" type="text" placeholder="과정명을 입력하세요..." />
           </div>
           <div class="input-box">
             <label>과정 호실 : </label>
-            <input type="text" placeholder="과정호실을 입력하세요..." />
+            <input id="courseRoom" type="text" placeholder="과정호실을 입력하세요..." />
           </div>
           <div class="input-box">
             <label>과정 기간 : </label>
-            <input type="date" value="2022-08-01" placeholder="과정 시작 날짜입력..." />
-            <input type="date" value="2023-02-06" placeholder="과정 종료 날짜입력..." />
+            <input id="courseStart" type="date" value="2022-08-01" placeholder="과정 시작 날짜입력..." />
+            <input id="courseEnd" type="date" value="2023-02-06" placeholder="과정 종료 날짜입력..." />
           </div>
           <div class="input-box">
             <label>담당 교사 : </label>
-            <input type="text" placeholder="교사이름 입력하세요..." />
+            <input id="courseTeacher" type="text" placeholder="교사이름 입력하세요..." />
           </div>
           <div class="btn-area">
             <a href="#" class="btn-cancel" onclick="">취소</a>
-            <a href="#" class="btn-success" onclick="">등록</a>
+            <a href="#" class="btn-success" onclick="doJoin()">등록</a>
           </div>
         </div>
       </div>
@@ -47,28 +47,28 @@
           </div>
           <div class="input-box">
             <label>과정 번호 : </label>
-            <input type="number" value="9983" placeholder="과정번호를 입력하세요..." />
+            <input id="f_courseNumber" type="number" placeholder="과정번호를 입력하세요..." />
           </div>
           <div class="input-box">
             <label>과정 명 : </label>
-            <input type="text" value="웹개발자 양성과정" placeholder="과정명을 입력하세요..." />
+            <input id="f_courseName" type="text" placeholder="과정명을 입력하세요..." />
           </div>
           <div class="input-box">
             <label>과정 호실 : </label>
-            <input type="text" value="501호" placeholder="과정호실을 입력하세요..." />
+            <input id="f_courseRoom" type="text" placeholder="과정호실을 입력하세요..." />
           </div>
           <div class="input-box">
             <label>과정 기간 : </label>
-            <input type="date" value="2022-08-02" placeholder="과정 시작 날짜입력..." />
-            <input type="date" value="2023-02-06" placeholder="과정 종료 날짜입력..." />
+            <input id="f_courseStart" type="date" placeholder="과정 시작 날짜입력..." />
+            <input id="f_courseEnd" type="date" placeholder="과정 종료 날짜입력..." />
           </div>
           <div class="input-box">
             <label>담당 교사 : </label>
-            <input type="text" value="현상원 명예교수" placeholder="교사이름 입력하세요..." />
+            <input id="f_courseTeacher" type="text" placeholder="교사이름 입력하세요..." />
           </div>
           <div class="btn-area">
-            <a href="#" class="btn-update" onclick="">수정</a>
-            <a href="#" class="btn-delete" onclick="">삭제</a>
+            <a href="#" class="btn-update" onclick="doUpdate()">수정</a>
+            <a href="#" class="btn-delete" onclick="doDelete()">삭제</a>
           </div>
         </div>
       </div>
@@ -81,13 +81,13 @@
             </a>
           </li>
           <li>
-            <a href="./index.html">
+            <a href="/student">
               <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
               <span class="title">학생 목록</span>
             </a>
           </li>
           <li>
-            <a href="./dept.html">
+            <a href="/course">
               <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
               <span class="title">과정 목록</span>
             </a>
@@ -120,22 +120,7 @@
                 <th>담당 교사</th>
               </tr>
             </thead>
-            <tbody id="data">
-              <tr onclick="getSubject()">
-                <td>18990</td>
-                <td>주짓수 개발자 양성 과정</td>
-                <td>501호</td>
-                <td>22.06.15 ~ 22.12.22</td>
-                <td>이정수</td>
-              </tr>
-              <tr onclick="getSubject()">
-                <td>18330</td>
-                <td>React.js 개발자 양성 과정</td>
-                <td>502호</td>
-                <td>22.12.07 ~ 23.05.01</td>
-                <td>이예진</td>
-              </tr>
-            </tbody>
+            <tbody id="data"></tbody>
           </table>
           <!-- 페이징 처리하는 HTML -->
           <div class="pagination">
@@ -178,12 +163,129 @@
       item.addEventListener('mouseover', activeLink);
     });
 
-    function getSubject() {
+    function getSubject(courseNumber) {
       $('.update-popup').css('display', 'block');
+      $.ajax({
+        url: '/course/' + courseNumber,
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+          $('#f_courseNumber').val(response.courseNumber);
+          $('#f_courseName').val(response.courseName);
+          $('#f_courseRoom').val(response.courseRoom);
+          $('#f_courseStart').val(response.courseStart);
+          $('#f_courseEnd').val(response.courseEnd);
+          $('#f_courseTeacher').val(response.courseTeacher);
+        },
+      });
     }
 
     function addSubject() {
       $('.write-popup').css('display', 'block');
+    }
+  </script>
+  <script>
+    callMyAPI();
+    function callMyAPI() {
+      $.ajax({
+        url: '/courses',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+          console.log(response);
+          for (var i in response) {
+            let tr = $('<tr onclick="getSubject( ' + response[i].courseNumber + ' )"></tr>');
+            let courseNumber = $('<td>' + response[i].courseNumber + '</td>');
+            let courseName = $('<td>' + response[i].courseName + '</td>');
+            let courseRoom = $('<td>' + response[i].courseRoom + '</td>');
+            let courseStart = $('<td>' + response[i].courseStart + '~' + response[i].courseEnd + '</td>');
+            let courseTeacher = $('<td>' + response[i].courseTeacher + '</td>');
+            tr.append(courseNumber);
+            tr.append(courseName);
+            tr.append(courseRoom);
+            tr.append(courseStart);
+            tr.append(courseTeacher);
+            $('#data').append(tr);
+          }
+        },
+      });
+    }
+
+    function doJoin() {
+      var courseNumber = $('#courseNumber').val();
+      var courseName = $('#courseName').val();
+      var courseRoom = $('#courseRoom').val();
+      var courseStart = $('#courseStart').val();
+      var courseEnd = $('#courseEnd').val();
+      var courseTeacher = $('#courseTeacher').val();
+
+      var jsonData = {
+        courseNumber: courseNumber,
+        courseName: courseName,
+        courseRoom: courseRoom,
+        courseStart: courseStart,
+        courseEnd: courseEnd,
+        courseTeacher: courseTeacher,
+      };
+
+      //AJAX 호출
+      $.ajax({
+        url: '/course',
+        contentType: 'application/json', //서버에 json타입으로 보낼 예정(요청)
+        type: 'POST',
+        data: JSON.stringify(jsonData),
+        dataType: 'json',
+        success: function (response) {
+          alert('과정추가 완료');
+          location.reload(); //새로고침
+        },
+      });
+    }
+
+    function doUpdate() {
+      var courseNumber = $('#f_courseNumber').val();
+      var courseName = $('#f_courseName').val();
+      var courseRoom = $('#f_courseRoom').val();
+      var courseStart = $('#f_courseStart').val();
+      var courseEnd = $('#f_courseEnd').val();
+      var courseTeacher = $('#f_courseTeacher').val();
+
+      var jsonData = {
+        courseNumber: courseNumber,
+        courseName: courseName,
+        courseRoom: courseRoom,
+        courseStart: courseStart,
+        courseEnd: courseEnd,
+        courseTeacher: courseTeacher,
+      };
+
+      $.ajax({
+        url: '/course',
+        type: 'PATCH',
+        contentType: 'application/json', //서버에 json타입으로 보낼 예정(요청)
+        data: JSON.stringify(jsonData),
+        dataType: 'json',
+        success: function (response) {
+          alert('과정수정 완료');
+          location.reload(); //새로고침
+        },
+      });
+    }
+
+    function doDelete() {
+      var courseNumber = $('#f_courseNumber').val();
+      console.log(courseNumber);
+      // 사원삭제 ajax 연결하기
+      $.ajax({
+        url: '/course/' + courseNumber,
+        type: 'DELETE',
+        dataType: 'json',
+        success: function (response) {
+          console.log(response);
+          alert(' 과정삭제완료 ');
+          location.reload(); //새로고침
+        },
+      });
     }
   </script>
 </html>
