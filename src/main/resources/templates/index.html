@@ -25,12 +25,18 @@
             <input id="studentPhone" type="number" placeholder=" - 를 제거하고 입력하세요." />
           </div>
           <div class="input-box">
-            <label>주소 </label>
+            <label>과정명 : </label>
+            <select id="add-courseNumber">
+              <option value="">과정명을 선택해주세요</option>
+            </select>
+          </div>
+          <div class="input-box">
+            <label>주소</label>
             <input id="address" type="text" placeholder=" 주소를 입력하세요..." />
             <button class="postBtn" onclick="getPostCode()">우편번호 찾기</button>
           </div>
           <div class="btn-area">
-            <a href="#" class="btn-cancel" onclick="">등록 취소</a>
+            <a href="#" class="btn-cancel" onclick="cancel()">등록 취소</a>
             <a href="#" class="btn-success" onclick="doJoin()">학생 등록</a>
           </div>
         </div>
@@ -43,23 +49,29 @@
           </div>
           <div class="input-box">
             <label>학생 번호 : </label>
-            <input id="f_studentNumber" type="number" readonly />
+            <input id="update-studentNumber" type="number" readonly />
           </div>
           <div class="input-box">
             <label>학생 이름 : </label>
-            <input id="f_studentName" type="text" />
+            <input id="update-studentName" type="text" />
           </div>
           <div class="input-box">
             <label>학생 나이 : </label>
-            <input id="f_studentAge" type="number" placeholder=" 나이를 입력하세요..." />
+            <input id="update-studentAge" type="number" placeholder=" 나이를 입력하세요..." />
           </div>
           <div class="input-box">
             <label>연락처 : </label>
-            <input id="f_studentPhone" type="number" placeholder=" - 를 제거하고 입력하세요." />
+            <input id="update-studentPhone" type="number" placeholder=" - 를 제거하고 입력하세요." />
+          </div>
+          <div class="input-box">
+            <label>과정명 : </label>
+            <select id="update-courseNumber">
+              <option value="">과정명을 선택해주세요</option>
+            </select>
           </div>
           <div class="input-box">
             <label>주소 </label>
-            <input id="f_address" type="text" placeholder=" 주소를 입력하세요..." />
+            <input id="update-address" type="text" placeholder=" 주소를 입력하세요..." />
             <button class="postBtn" onclick="getPostCode()">우편번호 찾기</button>
           </div>
           <div class="btn-area">
@@ -193,11 +205,12 @@
         type: 'GET',
         dataType: 'json',
         success: function (response) {
-          $('#f_studentNumber').val(response.studentNumber);
-          $('#f_studentName').val(response.studentName);
-          $('#f_studentAge').val(response.studentAge);
-          $('#f_studentPhone').val(response.studentPhone);
-          $('#f_address').val(response.address);
+          $('#update-studentNumber').val(response.studentNumber);
+          $('#update-studentName').val(response.studentName);
+          $('#update-studentAge').val(response.studentAge);
+          $('#update-studentPhone').val(response.studentPhone);
+          $('#update-address').val(response.address);
+          $('#update-courseNumber').val(response.course.courseNumber);
         },
       });
     }
@@ -228,6 +241,7 @@
             fullRoadAddr += extraRoadAddr;
           }
           $('#address').val(fullRoadAddr);
+          $('#update-address').val(fullRoadAddr);
         },
       }).open();
     }
@@ -243,7 +257,6 @@
         dataType: 'json',
         success: function (response) {
           console.log(response);
-
           for (var i in response) {
             let tr = $("<tr onclick='getData( " + response[i].studentNumber + " )'></tr>");
             let studentNumber = $('<td>' + response[i].studentNumber + '</td>');
@@ -255,17 +268,17 @@
                 '-' +
                 response[i].studentPhone.substring(3, 7) +
                 '-' +
-                response[i].studentPhone.substring(7, 11) +
+                response[i].studentPhone.substring(7, 11).replace(/[0-9]/g, '*') +
                 '</td>',
             );
             let address = $('<td>' + response[i].address + '</td>');
-            let curriculumName = $('<td>' + response[i].curriculumName + '</td>');
+            let courseName = $('<td>' + response[i].course.courseName + '</td>');
             tr.append(studentNumber);
             tr.append(studentName);
             tr.append(studentAge);
             tr.append(studentPhone);
             tr.append(address);
-            tr.append(curriculumName);
+            tr.append(courseName);
             $('#data').append(tr);
             studentsCnt += 1;
             boardCnt += response[i].studentAge;
@@ -277,17 +290,39 @@
       });
     }
 
+    $.ajax({
+      url: '/courses',
+      type: 'GET',
+      dataType: 'json',
+      success: function (response) {
+        console.log(response);
+        for (var i in response) {
+          var courseName = '<option value="' + response[i].courseNumber + '">' + response[i].courseName + '</option>';
+          $('#add-courseNumber').append(courseName);
+          $('#update-courseNumber').append(courseName);
+        }
+      },
+    });
+
+    function cancel() {
+      alert('등록취소 되었습니다.');
+    }
+
     function doJoin() {
       var studentName = $('#studentName').val();
       var studentAge = $('#studentAge').val();
       var studentPhone = $('#studentPhone').val();
       var address = $('#address').val();
+      var courseNumber = $('#add-courseNumber').val();
 
       var jsonData = {
         studentName: studentName,
         studentAge: studentAge,
         studentPhone: studentPhone,
         address: address,
+        course: {
+          courseNumber: courseNumber,
+        },
       };
 
       //AJAX 호출
@@ -305,11 +340,12 @@
     }
 
     function doUpdate() {
-      var studentNumber = $('#f_studentNumber').val();
-      var studentName = $('#f_studentName').val();
-      var studentAge = $('#f_studentAge').val();
-      var studentPhone = $('#f_studentPhone').val();
-      var address = $('#f_address').val();
+      var studentNumber = $('#update-studentNumber').val();
+      var studentName = $('#update-studentName').val();
+      var studentAge = $('#update-studentAge').val();
+      var studentPhone = $('#update-studentPhone').val();
+      var address = $('#update-address').val();
+      var courseNumber = $('#update-courseNumber').val();
 
       var jsonData = {
         studentNumber: studentNumber,
@@ -317,6 +353,9 @@
         studentAge: studentAge,
         studentPhone: studentPhone,
         address: address,
+        course: {
+          courseNumber: courseNumber,
+        },
       };
 
       $.ajax({
@@ -333,7 +372,7 @@
     }
 
     function doDelete() {
-      var studentNumber = $('#f_studentNumber').val();
+      var studentNumber = $('#update-studentNumber').val();
       // 사원삭제 ajax 연결하기
       $.ajax({
         url: '/student/' + studentNumber,

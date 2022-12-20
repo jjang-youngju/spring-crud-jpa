@@ -47,24 +47,24 @@
           </div>
           <div class="input-box">
             <label>과정 번호 : </label>
-            <input id="f_courseNumber" type="number" placeholder="과정번호를 입력하세요..." />
+            <input id="update-courseNumber" type="number" placeholder="과정번호를 입력하세요..." readonly />
           </div>
           <div class="input-box">
             <label>과정 명 : </label>
-            <input id="f_courseName" type="text" placeholder="과정명을 입력하세요..." />
+            <input id="update-courseName" type="text" placeholder="과정명을 입력하세요..." readonly />
           </div>
           <div class="input-box">
             <label>과정 호실 : </label>
-            <input id="f_courseRoom" type="text" placeholder="과정호실을 입력하세요..." />
+            <input id="update-courseRoom" type="text" placeholder="과정호실을 입력하세요..." />
           </div>
           <div class="input-box">
             <label>과정 기간 : </label>
-            <input id="f_courseStart" type="date" placeholder="과정 시작 날짜입력..." />
-            <input id="f_courseEnd" type="date" placeholder="과정 종료 날짜입력..." />
+            <input id="update-courseStart" type="date" placeholder="과정 시작 날짜입력..." />
+            <input id="update-courseEnd" type="date" placeholder="과정 종료 날짜입력..." />
           </div>
           <div class="input-box">
             <label>담당 교사 : </label>
-            <input id="f_courseTeacher" type="text" placeholder="교사이름 입력하세요..." />
+            <input id="update-courseTeacher" type="text" placeholder="교사이름 입력하세요..." />
           </div>
           <div class="btn-area">
             <a href="#" class="btn-update" onclick="doUpdate()">수정</a>
@@ -170,12 +170,12 @@
         type: 'GET',
         dataType: 'json',
         success: function (response) {
-          $('#f_courseNumber').val(response.courseNumber);
-          $('#f_courseName').val(response.courseName);
-          $('#f_courseRoom').val(response.courseRoom);
-          $('#f_courseStart').val(response.courseStart);
-          $('#f_courseEnd').val(response.courseEnd);
-          $('#f_courseTeacher').val(response.courseTeacher);
+          $('#update-courseNumber').val(response.courseNumber);
+          $('#update-courseName').val(response.courseName);
+          $('#update-courseRoom').val(response.courseRoom);
+          $('#update-courseStart').val(response.courseStart);
+          $('#update-courseEnd').val(response.courseEnd);
+          $('#update-courseTeacher').val(response.courseTeacher);
         },
       });
     }
@@ -194,11 +194,32 @@
         success: function (response) {
           console.log(response);
           for (var i in response) {
+            var startDate = response[i].courseStart.split('');
+            var endDate = response[i].courseEnd.split('');
+            var startDateResult = [];
+            var endDateResult = [];
+            for (j = 2; j < 4; j++) {
+              startDateResult.push(startDate[j]);
+              endDateResult.push(endDate[j]);
+            }
+            startDateResult.push('.');
+            endDateResult.push('.');
+            for (j = 5; j < 7; j++) {
+              startDateResult.push(startDate[j]);
+              endDateResult.push(endDate[j]);
+            }
+            startDateResult.push('.');
+            endDateResult.push('.');
+            for (j = 8; j < 10; j++) {
+              startDateResult.push(startDate[j]);
+              endDateResult.push(endDate[j]);
+            }
+
             let tr = $('<tr onclick="getSubject( ' + response[i].courseNumber + ' )"></tr>');
             let courseNumber = $('<td>' + response[i].courseNumber + '</td>');
             let courseName = $('<td>' + response[i].courseName + '</td>');
             let courseRoom = $('<td>' + response[i].courseRoom + '</td>');
-            let courseStart = $('<td>' + response[i].courseStart + '~' + response[i].courseEnd + '</td>');
+            let courseStart = $('<td>' + startDateResult.join('') + '~' + endDateResult.join('') + '</td>');
             let courseTeacher = $('<td>' + response[i].courseTeacher + '</td>');
             tr.append(courseNumber);
             tr.append(courseName);
@@ -243,12 +264,12 @@
     }
 
     function doUpdate() {
-      var courseNumber = $('#f_courseNumber').val();
-      var courseName = $('#f_courseName').val();
-      var courseRoom = $('#f_courseRoom').val();
-      var courseStart = $('#f_courseStart').val();
-      var courseEnd = $('#f_courseEnd').val();
-      var courseTeacher = $('#f_courseTeacher').val();
+      var courseNumber = $('#update-courseNumber').val();
+      var courseName = $('#update-courseName').val();
+      var courseRoom = $('#update-courseRoom').val();
+      var courseStart = $('#update-courseStart').val();
+      var courseEnd = $('#update-courseEnd').val();
+      var courseTeacher = $('#update-courseTeacher').val();
 
       var jsonData = {
         courseNumber: courseNumber,
@@ -273,7 +294,7 @@
     }
 
     function doDelete() {
-      var courseNumber = $('#f_courseNumber').val();
+      var courseNumber = $('#update-courseNumber').val();
       console.log(courseNumber);
       // 사원삭제 ajax 연결하기
       $.ajax({

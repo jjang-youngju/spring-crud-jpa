@@ -28,8 +28,6 @@ public class Student {
     private String studentPhone;
     @Column
     private String address;
-    @Column
-    private String curriculumName;
 
     @ManyToOne
     @JoinColumn(name="course_number")

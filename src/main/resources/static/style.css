@@ -322,7 +322,13 @@ body {
   border: solid 2px #1e90ff;
   border-radius: 5px;
 }
-
+select {
+  border: solid 2px #1e90ff;
+  border-radius: 5px;
+  padding: 1%;
+  font-size: 18px;
+  width: 70%;
+}
 .btn-area {
   text-align: center;
 }
